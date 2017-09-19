@@ -5,6 +5,7 @@ namespace Adiuvo\Bundle\SoftDeleteableExtensionBundle\EventListener;
 
 use Adiuvo\Bundle\SoftDeleteableExtensionBundle\Exception\OnSoftDeleteCascadeException;
 use Doctrine\ORM\Event\LifecycleEventArgs;
+use Doctrine\ORM\Mapping\ClassMetadataInfo;
 use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
@@ -23,6 +24,10 @@ class SoftDeleteListener
         $mappings = [];
 
         foreach ($this->getClassMetaData($args)->getAssociationMappings() as $associationMapping) {
+            if ($associationMapping['type'] === ClassMetadataInfo::MANY_TO_ONE) {
+                continue;
+            }
+
             if ($propertyAccessor->isReadable($args->getEntity(), $associationMapping['fieldName']) === false) {
                 continue;
             }
